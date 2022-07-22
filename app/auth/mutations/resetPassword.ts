@@ -1,4 +1,4 @@
-import { resolver, SecurePassword, hash256 } from "blitz"
+import { SecurePassword, hash256 } from "@blitzjs/auth"
 import db from "db"
 import { ResetPassword } from "../validations"
 import login from "./login"
@@ -8,9 +8,10 @@ export class ResetPasswordError extends Error {
   message = "Reset password link is invalid or it has expired."
 }
 
-export default resolver.pipe(resolver.zod(ResetPassword), async ({ password, token }, ctx) => {
+export default async function resetPassword(input, ctx) {
+  ResetPassword.parse(input)
   // 1. Try to find this token in the database
-  const hashedToken = hash256(token)
+  const hashedToken = hash256(input.token)
   const possibleToken = await db.token.findFirst({
     where: { hashedToken, type: "RESET_PASSWORD" },
     include: { user: true },
@@ -31,7 +32,7 @@ export default resolver.pipe(resolver.zod(ResetPassword), async ({ password, tok
   }
 
   // 5. Since token is valid, now we can update the user's password
-  const hashedPassword = await SecurePassword.hash(password.trim())
+  const hashedPassword = await SecurePassword.hash(input.password.trim())
   const user = await db.user.update({
     where: { id: savedToken.userId },
     data: { hashedPassword },
@@ -41,7 +42,7 @@ export default resolver.pipe(resolver.zod(ResetPassword), async ({ password, tok
   await db.session.deleteMany({ where: { userId: user.id } })
 
   // 7. Now log the user in with the new credentials
-  await login({ email: user.email, password }, ctx)
+  await login({ email: user.email, password: input.password }, ctx)
 
   return true
-})
+}

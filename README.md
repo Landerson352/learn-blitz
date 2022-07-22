@@ -2,7 +2,7 @@
 
 This is a [Blitz.js](https://github.com/blitz-js/blitz) app.
 
-# **learn-blitz**
+# ****name****
 
 ## Getting Started
 
