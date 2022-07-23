@@ -1,28 +1,22 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-datasource db {
-  provider = "postgres"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-// --------------------------------------
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
 model User {
-  id             Int      @id @default(autoincrement())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id             Int       @id @default(autoincrement())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
   name           String?
-  email          String   @unique
+  email          String    @unique
   hashedPassword String?
-  role           String   @default("USER")
-
-  tokens   Token[]
-  sessions Session[]
+  role           String    @default("USER")
+  sessions       Session[]
+  tokens         Token[]
 }
 
 model Session {
@@ -35,9 +29,8 @@ model Session {
   antiCSRFToken      String?
   publicData         String?
   privateData        String?
-
-  user   User? @relation(fields: [userId], references: [id])
-  userId Int?
+  userId             Int?
+  user               User?     @relation(fields: [userId], references: [id])
 }
 
 model Token {
@@ -46,20 +39,652 @@ model Token {
   updatedAt   DateTime @updatedAt
   hashedToken String
   type        String
-  // See note below about TokenType enum
-  // type        TokenType
   expiresAt   DateTime
   sentTo      String
-
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
 
   @@unique([hashedToken, type])
 }
 
-// NOTE: It's highly recommended to use an enum for the token type
-//       but enums only work in Postgres.
-//       See: https://blitzjs.com/docs/database-overview#switch-to-postgre-sql
-// enum TokenType {
-//   RESET_PASSWORD
-// }
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model activity {
+  id                      String  @db.Uuid
+  name                    String  @db.VarChar(255)
+  description             String? @db.VarChar
+  characterlevelmin       Int
+  characterlevelmax       Int
+  skillid                 String? @db.Uuid
+  skillidrequiredvalue    Int?
+  pvpchance               Int
+  racerestrictiontype     Int
+  raceid                  String? @db.Uuid
+  careerrestrictiontype   Int
+  careerid                String? @db.Uuid
+  imageid                 String? @db.Uuid
+  imagebackgroundcolor    String? @db.VarChar(10)
+  isdeleted               Boolean
+  notes                   String? @db.VarChar(3000)
+  gender                  Int?
+  singlebattleintroscript String? @db.VarChar
+  groupbattleintroscript  String? @db.VarChar
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model activityresult {
+  id                    String    @db.Uuid
+  result                String?   @db.VarChar
+  battleturns           String?   @db.VarChar
+  cash                  Int
+  experience            Int
+  health                Int?
+  pvpwins               Int?
+  pvplosses             Int?
+  customitemid1         String?   @db.Uuid
+  customitemid2         String?   @db.Uuid
+  activityid            String    @db.Uuid
+  featid                String?   @db.Uuid
+  skillid               String?   @db.Uuid
+  isnewskill            Boolean?
+  resultscalculateddate DateTime? @db.Timestamp(6)
+  resultsallocateddate  DateTime? @db.Timestamp(6)
+  characterid           String?   @db.Uuid
+  issuccess             Boolean?
+  battleevents          String?   @db.VarChar
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model activityskillrequirements {
+  activityskillrequirementid Int
+  actiivityid                Int
+  skillid                    Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model adventure {
+  id                          String   @db.Uuid
+  name                        String?  @db.VarChar(50)
+  activityid                  String   @db.Uuid
+  itemidrequired              String?  @db.Uuid
+  itemconsumedonsuccess       Boolean
+  gender                      Int?
+  introductionscript          String?  @db.VarChar(5000)
+  adventurechecktypeid        String   @db.Uuid
+  fighttargettypeidcheck      String?  @db.Uuid
+  raceidfightcheck            String?  @db.Uuid
+  careeridfightcheck          String?  @db.Uuid
+  masknamefightcheck          String?  @db.VarChar(100)
+  levelfightcheck             Int?
+  usecharacterimagefightcheck Boolean?
+  maskimagebgcolorfightcheck  String?  @db.VarChar(10)
+  imageidmaskfightcheck       String?  @db.Uuid
+  skillidcheck                String?  @db.Uuid
+  skillvaluecheck             Int?
+  failurescript               String?  @db.VarChar(5000)
+  successscript               String?  @db.VarChar(5000)
+  itemidreward                String?  @db.Uuid
+  cashreward                  Int
+  itemtypeiddrop              String?  @db.Uuid
+  itemdropany                 Boolean
+  itemdroprelated             Boolean
+  itemdropkeywords            String?  @db.VarChar(100)
+  isdeleted                   Boolean
+  featidreward                String?  @db.Uuid
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model attribute {
+  attributeid Int
+  name        String @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model battlepool {
+  id             String   @db.Uuid
+  characterid    String   @db.Uuid
+  groupid        String?  @db.Uuid
+  characterlevel Int
+  battlelevel    Decimal  @db.Decimal(18, 2)
+  dateadded      DateTime @db.Timestamp(6)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model career {
+  id          String  @db.Uuid
+  name        String  @db.VarChar(255)
+  description String? @db.VarChar(1000)
+  gender      Int?
+  isdeleted   Boolean
+  gameid      Int
+  itemid1     String? @db.Uuid
+  itemid2     String? @db.Uuid
+  skillid1    String? @db.Uuid
+  skillid2    String? @db.Uuid
+  featid1     String? @db.Uuid
+  featid2     String? @db.Uuid
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model careerfeat {
+  id        String @db.Uuid
+  careerid  String @db.Uuid
+  featid    String @db.Uuid
+  sortorder Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model careeritem {
+  id        String @db.Uuid
+  careerid  String @db.Uuid
+  itemid    String @db.Uuid
+  sortorder Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model careerrace {
+  id           String @db.Uuid
+  careerid     String @db.Uuid
+  raceid       String @db.Uuid
+  maleweight   Int
+  femaleweight Int
+  malename     String @db.VarChar(255)
+  femalename   String @db.VarChar(255)
+  bio          String @db.VarChar(255)
+  malebio      String @db.VarChar(255)
+  femalebio    String @db.VarChar(50)
+  flavortext   String @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model careerskill {
+  id        String @db.Uuid
+  careerid  String @db.Uuid
+  skillid   String @db.Uuid
+  sortorder Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model character {
+  id                       String   @db.Uuid
+  userid                   String   @db.Uuid
+  careerid                 String   @db.Uuid
+  raceid                   String   @db.Uuid
+  imageid                  String   @db.Uuid
+  levelid                  String   @db.Uuid
+  name                     String   @db.VarChar(255)
+  experience               Int
+  gender                   Int
+  health                   Int
+  maxhealth                Int
+  biography                String   @db.VarChar
+  activityresult           String?  @db.VarChar
+  isdeleted                Boolean
+  datecreated              DateTime @db.Timestamp(6)
+  skillpoints              Int
+  activityresultid         String?  @db.Uuid
+  activityid               String?  @db.Uuid
+  pvpwins                  Int
+  pvplosses                Int
+  pvprating                Float
+  isnpc                    Boolean
+  groupid                  String?  @db.Uuid
+  datelastactivityselected DateTime @db.Timestamp(6)
+  isretired                Boolean
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model characterattribute {
+  characterattributeid Int
+  characterid          Int
+  attributeid          Int
+  value                Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model characterfeat {
+  id          String  @db.Uuid
+  characterid String  @db.Uuid
+  featid      String  @db.Uuid
+  rank        Int
+  isequipped  Boolean
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model charactergroup {
+  id          String @db.Uuid
+  characterid String @db.Uuid
+  groupid     String @db.Uuid
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model characterskill {
+  id             String @db.Uuid
+  characterid    String @db.Uuid
+  skillid        String @db.Uuid
+  value          Int
+  freepointvalue Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model classactivity {
+  classactivityid Int
+  classid         Int
+  activityid      Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model classattribute {
+  classattributeid Int
+  classid          Int
+  attributeid      Int
+  defaultrank      Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model condition {
+  conditionid Int
+  name        String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model customitem {
+  id          String  @db.Uuid
+  itemid      String  @db.Uuid
+  name        String? @db.VarChar(255)
+  description String? @db.VarChar(3000)
+  flavortext  String? @db.VarChar(3000)
+  notrade     Boolean
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model effect {
+  id                   String  @db.Uuid
+  name                 String? @db.VarChar(50)
+  effectdurationtypeid String? @db.Uuid
+  duration             Int?
+  attackmodifier       Int
+  attackkeyword        String? @db.VarChar(255)
+  defensemodifier      Int
+  defensekeyword       String? @db.VarChar(255)
+  damagehealing        Int
+  armormodifier        Int
+  weapondamagemodifier Int
+  isdeleted            Boolean
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model effectcondition {
+  effectconditionid Int
+  effectid          Int
+  conditionid       Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model feat {
+  id                           String  @db.Uuid
+  name                         String? @db.VarChar(255)
+  description                  String? @db.VarChar(255)
+  featcastmodeid               String? @db.Uuid
+  reactiveevent                String? @db.VarChar(255)
+  featreactiveeventinitiatorid String? @db.Uuid
+  cooldown                     Int
+  skillid                      String? @db.Uuid
+  skillrequiredvalue           Int?
+  featspecialmechanicid        String? @db.Uuid
+  cashprize                    Int
+  feattargettypeidtarget1      String? @db.Uuid
+  gendertarget1                Int?
+  damagehealingtarget1         Int
+  racerestrictiontypetarget1   Int
+  raceidtarget1                String? @db.Uuid
+  careerrestrictiontypetarget1 Int
+  careeridtarget1              String? @db.Uuid
+  effectidtarget1              String? @db.Uuid
+  feattargettypeidtarget2      String? @db.Uuid
+  gendertarget2                Int?
+  damagehealingtarget2         Int
+  racerestrictiontypetarget2   Int
+  raceidtarget2                String? @db.Uuid
+  careerrestrictiontypetarget2 Int
+  careeridtarget2              String? @db.Uuid
+  effectidtarget2              String? @db.Uuid
+  target1onlyscript            String  @db.VarChar
+  target2onlyscript            String  @db.VarChar
+  successscript                String  @db.VarChar
+  failurescript                String  @db.VarChar
+  isdeleted                    Boolean
+  imageid                      String? @db.Uuid
+  racerestrictiontype          Int?
+  raceid                       String? @db.Uuid
+  careerrestrictiontype        Int?
+  careerid                     String? @db.Uuid
+  gender                       Int?
+  level                        Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model forumcategory {
+  id              String   @db.Uuid
+  cssclass        String?  @db.VarChar(50)
+  title           String?  @db.VarChar(200)
+  creationdate    DateTime @db.Timestamp(6)
+  isdeleted       Boolean
+  displaypriority Int?
+  islocked        Boolean
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model forumpost {
+  id            String   @db.Uuid
+  userid        String   @db.Uuid
+  forumthreadid String   @db.Uuid
+  content       String?  @db.VarChar(5000)
+  creationdate  DateTime @db.Timestamp(6)
+  isdeleted     Boolean
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model forumthread {
+  id              String   @db.Uuid
+  userid          String   @db.Uuid
+  forumcategoryid String   @db.Uuid
+  content         String?  @db.VarChar(5000)
+  islocked        Boolean
+  issticky        Boolean
+  creationdate    DateTime @db.Timestamp(6)
+  isdeleted       Boolean
+  title           String?  @db.VarChar(200)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model game {
+  gameid             Int
+  name               Int
+  description        String?  @db.VarChar(1000)
+  playercharactermax Int
+  datecreated        DateTime @db.Timestamp(6)
+  playerlabel        String   @db.VarChar(255)
+  characterlabel     String   @db.VarChar(255)
+  levellabel         String   @db.VarChar(255)
+  cashlabel          String   @db.VarChar(255)
+  healthlabel        String   @db.VarChar(255)
+  attributelabel     String   @db.VarChar(255)
+  featlabel          String   @db.VarChar(255)
+  skilllabel         String   @db.VarChar(255)
+  activitylabel      String   @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model gameattribute {
+  gameattribtureid Int
+  gameid           Int
+  attributeid      Int
+  name             Int
+  abbreviation     Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model gender {
+  id   String  @db.Uuid
+  name String? @db.VarChar(50)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model group {
+  id            String    @db.Uuid
+  startdatetime DateTime  @db.Timestamp(6)
+  enddatetime   DateTime? @db.Timestamp(6)
+  duration      Decimal   @db.Decimal(18, 0)
+  wins          Int
+  losses        Int
+  runtimes      Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model item {
+  id                    String  @db.Uuid
+  name                  String? @db.VarChar(255)
+  itemtypeid            String  @db.Uuid
+  characterlevel        Int
+  flavortext            String? @db.VarChar(3000)
+  description           String?
+  healing               Int
+  armor                 Int
+  attack                Int
+  attackkeyword         String? @db.VarChar(25)
+  damage                Int
+  damagevariance        Float
+  hitscript             String? @db.VarChar(100)
+  critscript            String? @db.VarChar(100)
+  missscript            String? @db.VarChar(100)
+  defense               Int
+  defensekeyword        String? @db.VarChar(50)
+  defendscript          String? @db.VarChar(100)
+  isdeleted             Boolean
+  imageid               String? @db.Uuid
+  imagebackgroundcolor  String? @db.VarChar(10)
+  notes                 String? @db.VarChar(3000)
+  racerestrictiontype   Int
+  raceid                String? @db.Uuid
+  careerrestrictiontype Int
+  careerid              String? @db.Uuid
+  notrade               Boolean
+  featid                String? @db.Uuid
+  notradeafterequip     Boolean
+  isvisibleininventory  Boolean
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model itemclassrestriction {
+  itemclassrestrictionid Int
+  itemid                 Int
+  classid                Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model itemkeyword {
+  itemkeywordid Int
+  itemid        Int
+  keyword       String @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model itemslot {
+  id   String  @db.Uuid
+  name String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model itemtype {
+  id        String  @db.Uuid
+  name      String  @db.VarChar(50)
+  isdeleted Boolean
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model race {
+  id        String  @db.Uuid
+  name      String  @db.VarChar(255)
+  isdeleted Boolean
+  itemid1   String? @db.Uuid
+  itemid2   String? @db.Uuid
+  skillid1  String? @db.Uuid
+  skillid2  String? @db.Uuid
+  featid1   String? @db.Uuid
+  featid2   String? @db.Uuid
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model racefeat {
+  id        String @db.Uuid
+  raceid    String @db.Uuid
+  featid    String @db.Uuid
+  sortorder Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model raceitem {
+  id        String @db.Uuid
+  raceid    String @db.Uuid
+  itemid    String @db.Uuid
+  sortorder Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model raceskill {
+  id        String @db.Uuid
+  raceid    String @db.Uuid
+  skillid   String @db.Uuid
+  sortorder Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model realm {
+  realmid     Int
+  gameid      Int
+  name        String  @db.VarChar(500)
+  description String? @db.VarChar(1000)
+  playermax   Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model role {
+  roleid Int
+  name   String @db.VarChar(50)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model round {
+  roundid Int
+  gameid  Int
+  time    DateTime @db.Timestamp(6)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model runtime {
+  id   String   @db.Uuid
+  time DateTime @db.Timestamp(6)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model skill {
+  id             String  @db.Uuid
+  name           String  @db.VarChar(255)
+  learningscript String  @db.VarChar
+  gameid         Int
+  isdeleted      Boolean
+  careerid       String? @db.Uuid
+  description    String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model useritem {
+  id                String  @db.Uuid
+  userid            String  @db.Uuid
+  customitemid      String  @db.Uuid
+  characterid       String? @db.Uuid
+  itemslotid        String? @db.Uuid
+  itemslotvariation Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model usertracking {
+  usertrackingid Int
+  userid         Int
+  playerid       Int?
+  gameid         Int?
+  realmid        Int?
+  dateloggedin   DateTime @db.Timestamp(6)
+
+  @@ignore
+}
