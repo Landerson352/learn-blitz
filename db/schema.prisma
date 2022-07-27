@@ -67,43 +67,39 @@ model activity {
   gender                  Int?
   singlebattleintroscript String?     @db.VarChar
   groupbattleintroscript  String?     @db.VarChar
-  skill                   skill?      @relation(fields: [skillid], references: [id])
-  race                    race?       @relation(fields: [raceid], references: [id])
   career                  career?     @relation(fields: [careerid], references: [id])
   image                   image?      @relation(fields: [imageid], references: [id])
+  race                    race?       @relation(fields: [raceid], references: [id])
+  skill                   skill?      @relation(fields: [skillid], references: [id])
   characters              character[]
 }
 
 model activityresult {
-  id                    String     @id @db.Uuid
-  result                String?    @db.VarChar
-  battleturns           String?    @db.VarChar
+  id                    String      @id @db.Uuid
+  result                String?     @db.VarChar
+  battleturns           String?     @db.VarChar
   cash                  Int
   experience            Int
   health                Int?
   pvpwins               Int?
   pvplosses             Int?
-  customitemid1         String?    @db.Uuid
-  customitemid2         String?    @db.Uuid
-  activityid            String     @db.Uuid
-  featid                String?    @db.Uuid
-  skillid               String?    @db.Uuid
+  customitemid1         String?     @db.Uuid
+  customitemid2         String?     @db.Uuid
+  activityid            String      @db.Uuid
+  featid                String?     @db.Uuid
+  skillid               String?     @db.Uuid
   isnewskill            Boolean?
-  resultscalculateddate DateTime?  @db.Timestamp(6)
-  resultsallocateddate  DateTime?  @db.Timestamp(6)
-  characterid           String?    @db.Uuid
+  resultscalculateddate DateTime?   @db.Timestamp(6)
+  resultsallocateddate  DateTime?   @db.Timestamp(6)
+  characterid           String?     @db.Uuid
   issuccess             Boolean?
-  battleevents          String?    @db.VarChar
-  feat                  feat?      @relation(fields: [featid], references: [id])
-  skill                 skill?     @relation(fields: [skillid], references: [id])
-  character             character? @relation(fields: [characterid], references: [id])
+  battleevents          String?     @db.VarChar
+  character             character?  @relation(fields: [characterid], references: [id])
+  customitem1           customitem? @relation("activityresult_customitemid1Tocustomitem", fields: [customitemid1], references: [id])
+  customitem2           customitem? @relation("activityresult_customitemid2Tocustomitem", fields: [customitemid2], references: [id])
+  feat                  feat?       @relation(fields: [featid], references: [id])
+  skill                 skill?      @relation(fields: [skillid], references: [id])
 }
-
-// model activityskillrequirements {
-//   activityskillrequirementid Int      @id @default(autoincrement())
-//   actiivityid                Int
-//   skillid                    Int
-// }
 
 model adventure {
   id                          String             @id @db.Uuid
@@ -135,14 +131,18 @@ model adventure {
   isdeleted                   Boolean
   featidreward                String?            @db.Uuid
   adventurechecktype          adventurechecktype @relation(fields: [adventurechecktypeid], references: [id])
+  career                      career?            @relation(fields: [careeridfightcheck], references: [id])
+  feat                        feat?              @relation(fields: [featidreward], references: [id])
+  fighttargettype             fighttargettype?   @relation(fields: [fighttargettypeidcheck], references: [id])
+  image                       image?             @relation(fields: [imageidmaskfightcheck], references: [id])
+  itemrequired                item?              @relation("adventure_itemidrequiredToitem", fields: [itemidrequired], references: [id])
+  itemreward                  item?              @relation("adventure_itemidrewardToitem", fields: [itemidreward], references: [id])
+  itemtype                    itemtype?          @relation(fields: [itemtypeiddrop], references: [id])
+  race                        race?              @relation(fields: [raceidfightcheck], references: [id])
+  skill                       skill?             @relation(fields: [skillidcheck], references: [id])
   careeradventure             careeradventure[]
   raceadventure               raceadventure[]
 }
-
-// model attribute {
-//   attributeid Int    @id @default(autoincrement())
-//   name        String @db.VarChar(255)
-// }
 
 model battlepool {
   id             String    @id @db.Uuid
@@ -168,29 +168,24 @@ model career {
   skillid2        String?           @db.Uuid
   featid1         String?           @db.Uuid
   featid2         String?           @db.Uuid
+  feat1           feat?             @relation("career_featid1Tofeat", fields: [featid1], references: [id])
+  feat2           feat?             @relation("career_featid2Tofeat", fields: [featid2], references: [id])
+  item1           item?             @relation("career_itemid1Toitem", fields: [itemid1], references: [id])
+  item2           item?             @relation("career_itemid2Toitem", fields: [itemid2], references: [id])
+  skill1          skill?            @relation("career_skillid1Toskill", fields: [skillid1], references: [id])
+  skill2          skill?            @relation("career_skillid2Toskill", fields: [skillid2], references: [id])
   activities      activity[]
+  adventure       adventure[]
+  careeradventure careeradventure[]
   careerrace      careerrace[]
   characters      character[]
   feat            feat[]
+  feats1          feat[]            @relation("careerTofeat_careeridtarget1")
+  feats2          feat[]            @relation("careerTofeat_careeridtarget2")
+  image           image[]
   item            item[]
   skill           skill[]
-  careeradventure careeradventure[]
-  image           image[]
 }
-
-// model careerfeat {
-//   id        String @id @db.Uuid
-//   careerid  String @db.Uuid
-//   featid    String @db.Uuid
-//   sortorder Int
-// }
-
-// model careeritem {
-//   id        String @id @db.Uuid
-//   careerid  String @db.Uuid
-//   itemid    String @db.Uuid
-//   sortorder Int
-// }
 
 model careerrace {
   id               String             @id @db.Uuid
@@ -208,13 +203,6 @@ model careerrace {
   race             race               @relation(fields: [raceid], references: [id])
   characterforhire characterforhire[]
 }
-
-// model careerskill {
-//   id        String @id @db.Uuid
-//   careerid  String @db.Uuid
-//   skillid   String @db.Uuid
-//   sortorder Int
-// }
 
 model character {
   id                       String           @id @db.Uuid
@@ -242,25 +230,18 @@ model character {
   groupid                  String?          @db.Uuid
   datelastactivityselected DateTime         @db.Timestamp(6)
   isretired                Boolean
+  activity                 activity?        @relation(fields: [activityid], references: [id])
   career                   career           @relation(fields: [careerid], references: [id])
-  race                     race             @relation(fields: [raceid], references: [id])
   image                    image            @relation(fields: [imageid], references: [id])
   level                    characterlevel   @relation(fields: [levelid], references: [id])
-  activity                 activity?        @relation(fields: [activityid], references: [id])
+  race                     race             @relation(fields: [raceid], references: [id])
   activityresults          activityresult[]
   battlepool               battlepool[]
-  charactergroup           charactergroup[]
   characterfeat            characterfeat[]
+  charactergroup           charactergroup[]
   characterskill           characterskill[]
   useritem                 useritem[]
 }
-
-// model characterattribute {
-//   characterattributeid Int @id @default(autoincrement())
-//   characterid          Int
-//   attributeid          Int
-//   value                Int
-// }
 
 model characterfeat {
   id          String    @id @db.Uuid
@@ -290,33 +271,17 @@ model characterskill {
   skill          skill     @relation(fields: [skillid], references: [id])
 }
 
-// model classactivity {
-//   classactivityid Int @id @default(autoincrement())
-//   classid         Int
-//   activityid      Int
-// }
-
-// model classattribute {
-//   classattributeid Int @id @default(autoincrement())
-//   classid          Int
-//   attributeid      Int
-//   defaultrank      Int
-// }
-
-// model condition {
-//   conditionid Int     @id @default(autoincrement())
-//   name        String? @db.VarChar(255)
-// }
-
 model customitem {
-  id          String     @id @db.Uuid
-  itemid      String     @db.Uuid
-  name        String?    @db.VarChar(255)
-  description String?    @db.VarChar(3000)
-  flavortext  String?    @db.VarChar(3000)
-  notrade     Boolean
-  item        item       @relation(fields: [itemid], references: [id])
-  useritem    useritem[]
+  id               String           @id @db.Uuid
+  itemid           String           @db.Uuid
+  name             String?          @db.VarChar(255)
+  description      String?          @db.VarChar(3000)
+  flavortext       String?          @db.VarChar(3000)
+  notrade          Boolean
+  item             item             @relation(fields: [itemid], references: [id])
+  activityresults1 activityresult[] @relation("activityresult_customitemid1Tocustomitem")
+  activityresults2 activityresult[] @relation("activityresult_customitemid2Tocustomitem")
+  useritem         useritem[]
 }
 
 model effect {
@@ -335,61 +300,70 @@ model effect {
   effectdurationtype         effectdurationtype?          @relation(fields: [effectdurationtypeid], references: [id])
   effectskillbonus           effectskillbonus[]
   effectspecialmechaniccombo effectspecialmechaniccombo[]
+  feats1                     feat[]                       @relation("effectTofeat_effectidtarget1")
+  feats2                     feat[]                       @relation("effectTofeat_effectidtarget2")
 }
 
-// model effectcondition {
-//   effectconditionid Int @id @default(autoincrement())
-//   effectid          Int
-//   conditionid       Int
-// }
-
 model feat {
-  id                           String                      @id @db.Uuid
-  name                         String?                     @db.VarChar(255)
-  description                  String?                     @db.VarChar(255)
-  featcastmodeid               String?                     @db.Uuid
-  reactiveevent                String?                     @db.VarChar(255)
-  featreactiveeventinitiatorid String?                     @db.Uuid
-  cooldown                     Int
-  skillid                      String?                     @db.Uuid
-  skillrequiredvalue           Int?
-  featspecialmechanicid        String?                     @db.Uuid
-  cashprize                    Int
-  feattargettypeidtarget1      String?                     @db.Uuid
-  gendertarget1                Int?
-  damagehealingtarget1         Int
-  racerestrictiontypetarget1   Int
-  raceidtarget1                String?                     @db.Uuid
-  careerrestrictiontypetarget1 Int
-  careeridtarget1              String?                     @db.Uuid
-  effectidtarget1              String?                     @db.Uuid
-  feattargettypeidtarget2      String?                     @db.Uuid
-  gendertarget2                Int?
-  damagehealingtarget2         Int
-  racerestrictiontypetarget2   Int
-  raceidtarget2                String?                     @db.Uuid
-  careerrestrictiontypetarget2 Int
-  careeridtarget2              String?                     @db.Uuid
-  effectidtarget2              String?                     @db.Uuid
-  target1onlyscript            String                      @db.VarChar
-  target2onlyscript            String                      @db.VarChar
-  successscript                String                      @db.VarChar
-  failurescript                String                      @db.VarChar
-  isdeleted                    Boolean
-  imageid                      String?                     @db.Uuid
-  racerestrictiontype          Int?
-  raceid                       String?                     @db.Uuid
-  careerrestrictiontype        Int?
-  careerid                     String?                     @db.Uuid
-  gender                       Int?
-  level                        Int
-  featcastmode                 featcastmode?               @relation(fields: [featcastmodeid], references: [id])
-  featreactiveeventinitiator   featreactiveeventinitiator? @relation(fields: [featreactiveeventinitiatorid], references: [id])
-  featspecialmechanic          featspecialmechanic?        @relation(fields: [featspecialmechanicid], references: [id])
-  career                       career?                     @relation(fields: [careerid], references: [id])
-  activityresults              activityresult[]
-  characterfeat                characterfeat[]
-  item                         item[]
+  id                                                          String                      @id @db.Uuid
+  name                                                        String?                     @db.VarChar(255)
+  description                                                 String?                     @db.VarChar(255)
+  featcastmodeid                                              String?                     @db.Uuid
+  reactiveevent                                               String?                     @db.VarChar(255)
+  featreactiveeventinitiatorid                                String?                     @db.Uuid
+  cooldown                                                    Int
+  skillid                                                     String?                     @db.Uuid
+  skillrequiredvalue                                          Int?
+  featspecialmechanicid                                       String?                     @db.Uuid
+  cashprize                                                   Int
+  feattargettypeidtarget1                                     String?                     @db.Uuid
+  gendertarget1                                               Int?
+  damagehealingtarget1                                        Int
+  racerestrictiontypetarget1                                  Int
+  raceidtarget1                                               String?                     @db.Uuid
+  careerrestrictiontypetarget1                                Int
+  careeridtarget1                                             String?                     @db.Uuid
+  effectidtarget1                                             String?                     @db.Uuid
+  feattargettypeidtarget2                                     String?                     @db.Uuid
+  gendertarget2                                               Int?
+  damagehealingtarget2                                        Int
+  racerestrictiontypetarget2                                  Int
+  raceidtarget2                                               String?                     @db.Uuid
+  careerrestrictiontypetarget2                                Int
+  careeridtarget2                                             String?                     @db.Uuid
+  effectidtarget2                                             String?                     @db.Uuid
+  target1onlyscript                                           String                      @db.VarChar
+  target2onlyscript                                           String                      @db.VarChar
+  successscript                                               String                      @db.VarChar
+  failurescript                                               String                      @db.VarChar
+  isdeleted                                                   Boolean
+  imageid                                                     String?                     @db.Uuid
+  racerestrictiontype                                         Int?
+  raceid                                                      String?                     @db.Uuid
+  careerrestrictiontype                                       Int?
+  careerid                                                    String?                     @db.Uuid
+  gender                                                      Int?
+  level                                                       Int
+  career                                                      career?                     @relation(fields: [careerid], references: [id])
+  career_careerTofeat_careeridtarget1                         career?                     @relation("careerTofeat_careeridtarget1", fields: [careeridtarget1], references: [id])
+  career_careerTofeat_careeridtarget2                         career?                     @relation("careerTofeat_careeridtarget2", fields: [careeridtarget2], references: [id])
+  effect_effectTofeat_effectidtarget1                         effect?                     @relation("effectTofeat_effectidtarget1", fields: [effectidtarget1], references: [id])
+  effect_effectTofeat_effectidtarget2                         effect?                     @relation("effectTofeat_effectidtarget2", fields: [effectidtarget2], references: [id])
+  featcastmode                                                featcastmode?               @relation(fields: [featcastmodeid], references: [id])
+  featreactiveeventinitiator                                  featreactiveeventinitiator? @relation(fields: [featreactiveeventinitiatorid], references: [id])
+  featspecialmechanic                                         featspecialmechanic?        @relation(fields: [featspecialmechanicid], references: [id])
+  feattargettype_feat_feattargettypeidtarget1Tofeattargettype feattargettype?             @relation("feat_feattargettypeidtarget1Tofeattargettype", fields: [feattargettypeidtarget1], references: [id])
+  feattargettype_feat_feattargettypeidtarget2Tofeattargettype feattargettype?             @relation("feat_feattargettypeidtarget2Tofeattargettype", fields: [feattargettypeidtarget2], references: [id])
+  race_feat_raceidtarget1Torace                               race?                       @relation("feat_raceidtarget1Torace", fields: [raceidtarget1], references: [id])
+  race_feat_raceidtarget2Torace                               race?                       @relation("feat_raceidtarget2Torace", fields: [raceidtarget2], references: [id])
+  activityresults                                             activityresult[]
+  adventure                                                   adventure[]
+  career_career_featid1Tofeat                                 career[]                    @relation("career_featid1Tofeat")
+  career_career_featid2Tofeat                                 career[]                    @relation("career_featid2Tofeat")
+  characterfeat                                               characterfeat[]
+  item                                                        item[]
+  race_featTorace_featid1                                     race[]                      @relation("featTorace_featid1")
+  race_featTorace_featid2                                     race[]                      @relation("featTorace_featid2")
 }
 
 model forumcategory {
@@ -426,31 +400,6 @@ model forumthread {
   forumcategory   forumcategory @relation(fields: [forumcategoryid], references: [id])
   forumpost       forumpost[]
 }
-
-// model game {
-//   gameid             Int      @id @default(autoincrement())
-//   name               Int
-//   description        String?  @db.VarChar(1000)
-//   playercharactermax Int
-//   datecreated        DateTime @db.Timestamp(6)
-//   playerlabel        String   @db.VarChar(255)
-//   characterlabel     String   @db.VarChar(255)
-//   levellabel         String   @db.VarChar(255)
-//   cashlabel          String   @db.VarChar(255)
-//   healthlabel        String   @db.VarChar(255)
-//   attributelabel     String   @db.VarChar(255)
-//   featlabel          String   @db.VarChar(255)
-//   skilllabel         String   @db.VarChar(255)
-//   activitylabel      String   @db.VarChar(255)
-// }
-
-// model gameattribute {
-//   gameattribtureid Int @id @default(autoincrement())
-//   gameid           Int
-//   attributeid      Int
-//   name             Int
-//   abbreviation     Int
-// }
 
 model gender {
   id    String  @id @db.Uuid
@@ -501,38 +450,33 @@ model item {
   featid                String?                @db.Uuid
   notradeafterequip     Boolean
   isvisibleininventory  Boolean
-  itemtype              itemtype               @relation(fields: [itemtypeid], references: [id])
-  image                 image?                 @relation(fields: [imageid], references: [id])
   career                career?                @relation(fields: [careerid], references: [id])
   feat                  feat?                  @relation(fields: [featid], references: [id])
+  image                 image?                 @relation(fields: [imageid], references: [id])
+  itemtype              itemtype               @relation(fields: [itemtypeid], references: [id])
+  adventuresrequired    adventure[]            @relation("adventure_itemidrequiredToitem")
+  adventuresrewarded    adventure[]            @relation("adventure_itemidrewardToitem")
+  careers1              career[]               @relation("career_itemid1Toitem")
+  careers2              career[]               @relation("career_itemid2Toitem")
   customitem            customitem[]
   itemequippableinslot  itemequippableinslot[]
   itemskillbonus        itemskillbonus[]
+  races1                race[]                 @relation("itemTorace_itemid1")
+  races2                race[]                 @relation("itemTorace_itemid2")
 }
-
-// model itemclassrestriction {
-//   itemclassrestrictionid Int @id @default(autoincrement())
-//   itemid                 Int
-//   classid                Int
-// }
-
-// model itemkeyword {
-//   itemkeywordid Int    @id @default(autoincrement())
-//   itemid        Int
-//   keyword       String @db.VarChar(255)
-// }
 
 model itemslot {
   id                   String                 @id @db.Uuid
   name                 String?                @db.VarChar(255)
-  useritem             useritem[]
   itemequippableinslot itemequippableinslot[]
+  useritem             useritem[]
 }
 
 model itemtype {
-  id        String  @id @db.Uuid
-  name      String  @db.VarChar(50)
+  id        String      @id @db.Uuid
+  name      String      @db.VarChar(50)
   isdeleted Boolean
+  adventure adventure[]
   item      item[]
 }
 
@@ -546,52 +490,21 @@ model race {
   skillid2      String?         @db.Uuid
   featid1       String?         @db.Uuid
   featid2       String?         @db.Uuid
+  feat1         feat?           @relation("featTorace_featid1", fields: [featid1], references: [id])
+  feat2         feat?           @relation("featTorace_featid2", fields: [featid2], references: [id])
+  item1         item?           @relation("itemTorace_itemid1", fields: [itemid1], references: [id])
+  item2         item?           @relation("itemTorace_itemid2", fields: [itemid2], references: [id])
+  skill1        skill?          @relation("race_skillid1Toskill", fields: [skillid1], references: [id])
+  skill2        skill?          @relation("race_skillid2Toskill", fields: [skillid2], references: [id])
   activities    activity[]
+  adventure     adventure[]
   careerrace    careerrace[]
   characters    character[]
+  feats1        feat[]          @relation("feat_raceidtarget1Torace")
+  feats2        feat[]          @relation("feat_raceidtarget2Torace")
   image         image[]
   raceadventure raceadventure[]
 }
-
-// model racefeat {
-//   id        String @id @db.Uuid
-//   raceid    String @db.Uuid
-//   featid    String @db.Uuid
-//   sortorder Int
-// }
-
-// model raceitem {
-//   id        String @id @db.Uuid
-//   raceid    String @db.Uuid
-//   itemid    String @db.Uuid
-//   sortorder Int
-// }
-
-// model raceskill {
-//   id        String @id @db.Uuid
-//   raceid    String @db.Uuid
-//   skillid   String @db.Uuid
-//   sortorder Int
-// }
-
-// model realm {
-//   realmid     Int     @id @default(autoincrement())
-//   gameid      Int
-//   name        String  @db.VarChar(500)
-//   description String? @db.VarChar(1000)
-//   playermax   Int
-// }
-
-// model role {
-//   roleid Int    @id @default(autoincrement())
-//   name   String @db.VarChar(50)
-// }
-
-// model round {
-//   roundid Int      @id @default(autoincrement())
-//   gameid  Int
-//   time    DateTime @db.Timestamp(6)
-// }
 
 model runtime {
   id   String   @id @db.Uuid
@@ -609,9 +522,14 @@ model skill {
   career           career?            @relation(fields: [careerid], references: [id])
   activities       activity[]
   activityresults  activityresult[]
+  adventure        adventure[]
+  careers1         career[]           @relation("career_skillid1Toskill")
+  careers2         career[]           @relation("career_skillid2Toskill")
   characterskill   characterskill[]
   effectskillbonus effectskillbonus[]
   itemskillbonus   itemskillbonus[]
+  races1           race[]             @relation("race_skillid1Toskill")
+  races2           race[]             @relation("race_skillid2Toskill")
 }
 
 model useritem {
@@ -621,19 +539,10 @@ model useritem {
   characterid       String?    @db.Uuid
   itemslotid        String?    @db.Uuid
   itemslotvariation Int?
-  customitem        customitem @relation(fields: [customitemid], references: [id])
   character         character? @relation(fields: [characterid], references: [id])
+  customitem        customitem @relation(fields: [customitemid], references: [id])
   itemslot          itemslot?  @relation(fields: [itemslotid], references: [id])
 }
-
-// model usertracking {
-//   usertrackingid Int      @id @default(autoincrement())
-//   userid         Int
-//   playerid       Int?
-//   gameid         Int?
-//   realmid        Int?
-//   dateloggedin   DateTime @db.Timestamp(6)
-// }
 
 model adventurechecktype {
   id        String      @id @db.Uuid
@@ -645,8 +554,8 @@ model careeradventure {
   id          String    @id @db.Uuid
   careerid    String    @db.Uuid
   adventureid String    @db.Uuid
-  career      career    @relation(fields: [careerid], references: [id])
   adventure   adventure @relation(fields: [adventureid], references: [id])
+  career      career    @relation(fields: [careerid], references: [id])
 }
 
 model characterforhire {
@@ -714,13 +623,16 @@ model featspecialmechanic {
 }
 
 model feattargettype {
-  id   String  @id @db.Uuid
-  name String? @db.VarChar(255)
+  id     String  @id @db.Uuid
+  name   String? @db.VarChar(255)
+  feats1 feat[]  @relation("feat_feattargettypeidtarget1Tofeattargettype")
+  feats2 feat[]  @relation("feat_feattargettypeidtarget2Tofeattargettype")
 }
 
 model fighttargettype {
-  id   String @id @db.Uuid
-  name String @db.VarChar(50)
+  id        String      @id @db.Uuid
+  name      String      @db.VarChar(50)
+  adventure adventure[]
 }
 
 model image {
@@ -732,11 +644,12 @@ model image {
   careerid        String?       @db.Uuid
   genderid        String?       @db.Uuid
   gender          Int?
-  imagecategory   imagecategory @relation(fields: [imagecategoryid], references: [id])
-  race            race?         @relation(fields: [raceid], references: [id])
   career          career?       @relation(fields: [careerid], references: [id])
   genderEntity    gender?       @relation(fields: [genderid], references: [id])
+  imagecategory   imagecategory @relation(fields: [imagecategoryid], references: [id])
+  race            race?         @relation(fields: [raceid], references: [id])
   activities      activity[]
+  adventure       adventure[]
   characters      character[]
   item            item[]
 }
@@ -747,13 +660,6 @@ model imagecategory {
   isdeleted Boolean
   image     image[]
 }
-
-// model imagelibrary {
-//   id              String @id @db.Uuid
-//   imageid         String @db.Uuid
-//   backgroundcolor String @db.VarChar(10)
-//   sourceid        String @db.Uuid
-// }
 
 model itemequippableinslot {
   id         String   @id @db.Uuid
@@ -793,14 +699,14 @@ model phrasevariationterm {
   name              String           @db.VarChar(100)
   phrasevariationid String?          @db.Uuid
   phraseid          String           @db.Uuid
-  phrasevariation   phrasevariation? @relation(fields: [phrasevariationid], references: [id])
   phrase            phrase           @relation(fields: [phraseid], references: [id])
+  phrasevariation   phrasevariation? @relation(fields: [phrasevariationid], references: [id])
 }
 
 model raceadventure {
   id          String    @id @db.Uuid
   raceid      String    @db.Uuid
   adventureid String    @db.Uuid
-  race        race      @relation(fields: [raceid], references: [id])
   adventure   adventure @relation(fields: [adventureid], references: [id])
+  race        race      @relation(fields: [raceid], references: [id])
 }
