@@ -10,6 +10,18 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// https://www.npmjs.com/package/zod-prisma
+
+generator zod {
+  provider = "zod-prisma"
+}
+
+// https://www.npmjs.com/package/prisma-json-schema-generator
+
+generator jsonSchema {
+  provider = "prisma-json-schema-generator"
+}
+
 // --------------------------------------
 
 model User {
@@ -41,13 +53,11 @@ model Session {
 }
 
 model Token {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   hashedToken String
-  type        String
-  // See note below about TokenType enum
-  // type        TokenType
+  type        TokenType
   expiresAt   DateTime
   sentTo      String
 
@@ -57,9 +67,26 @@ model Token {
   @@unique([hashedToken, type])
 }
 
-// NOTE: It's highly recommended to use an enum for the token type
-//       but enums only work in Postgres.
-//       See: https://blitzjs.com/docs/database-overview#switch-to-postgre-sql
-// enum TokenType {
-//   RESET_PASSWORD
-// }
+enum TokenType {
+  RESET_PASSWORD
+}
+
+model Image {
+  id       Int       @id @default(autoincrement())
+  file     String    @unique
+  products Product[]
+}
+
+model Product {
+  id                Int              @id @default(autoincrement())
+  name              String           @unique
+  images            Image[]
+  productCategory   ProductCategory? @relation(fields: [productCategoryId], references: [id])
+  productCategoryId Int?
+}
+
+model ProductCategory {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+}
